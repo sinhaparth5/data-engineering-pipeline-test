@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master', credentialsId: 'github-credentials', 'https://github.com/sinhaparth5/data-engineering-pipeline-test.git'
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    docker.image('python:3.10').inside {
+                        sh 'pip install -r requirements.txt'
+                    }
+                }
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                script {
+                    docker.image('python:3.10').inside {
+                        sh 'python -m unittest discover -s scripts'
+                    }
+                }
+            }
+        }
+        stage('Run ETL') {
+            steps {
+                script {
+                    docker.image('python:3.10').inside {
+                        sh 'python scripts/etl.py'
+                    }
+                }
+            }
+        }
+        post {
+            always {
+                archiveArtifacts artifacts: '**/*.csv', allowEmptyArchive: true
+            }
+        }
+    }
+}
