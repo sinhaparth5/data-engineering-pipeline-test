@@ -4,7 +4,7 @@ from datetime import datetime
 from minio import Minio
 
 def extract_data():
-    conn = psycopg2.connect(database="data_engineering", user="postgres", password="postgres", host="localhost", port="5432")
+    conn = psycopg2.connect(database="engineer", user="postgres", password="postgrespassword", host="localhost", port="5432")
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM sensor_data;")
     data = cursor.fetchall()
@@ -40,7 +40,7 @@ def load_data(transformed):
     )
 
     minio_client.fput_object(
-        "data-lake", filename, filename
+        "data-engineer-test", filename, filename
     )
 
     return filename
